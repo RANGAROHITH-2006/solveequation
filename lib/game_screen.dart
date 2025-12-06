@@ -22,6 +22,9 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
   int? selectedAnswer;
   bool? isCorrect;
 
+  // Get current question based on round
+  GameQuestion get currentQuestion => gameLevel.questions[currentRound - 1];
+
   @override
   void initState() {
     super.initState();
@@ -32,6 +35,8 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
   void _initializeGame() {
     gameLevel = GameData.getLevelData(widget.level) ?? GameData.levels.first;
     timeRemaining = gameLevel.timeLimit;
+    currentRound = 1;
+    score = 0;
   }
 
   void _startTimer() {
@@ -98,35 +103,38 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
   void _selectAnswer(int answer) {
     setState(() {
       selectedAnswer = answer;
-      isCorrect = answer == gameLevel.correctAnswer;
+      isCorrect = answer == currentQuestion.correctAnswer;
     });
 
     if (isCorrect!) {
+      // Correct answer: +10 points
       setState(() {
-        score += gameLevel.pointsPerCorrect;
+        score += 10;
       });
-      _showResultPopup(
-        'Correct !',
-        'Great job! You got the right answer.',
-        Colors.green,
-        Icons.check_circle,
-      );
+      // Check if this was the last round
+      if (currentRound >= GameData.roundsPerLevel) {
+        // Level completed - show completion popup
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _showLevelCompletePopup();
+        });
+      } else {
+        // Auto proceed to next round after a brief delay
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _goToNextRound();
+        });
+      }
     } else {
-      _showResultPopup(
-        'Wrong !',
-        'The correct answer is ${gameLevel.correctAnswer}',
-        Colors.red,
-        Icons.cancel,
-      );
+      // Wrong answer: -5 points
+      setState(() {
+        score -= 5;
+        if (score < 0) score = 0; // Don't go below 0
+      });
+      // Show wrong answer popup with both answers
+      _showWrongAnswerPopup(answer, currentQuestion.correctAnswer);
     }
   }
 
-  void _showResultPopup(
-    String title,
-    String message,
-    Color color,
-    IconData icon,
-  ) {
+  void _showWrongAnswerPopup(int userAnswer, int correctAnswer) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -149,30 +157,233 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: Colors.red.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, color: color, size: 50),
+                  child: const Icon(Icons.cancel, color: Colors.red, size: 50),
                 ),
                 const SizedBox(height: 16),
-                // Title
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
+                // Title with -5
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Wrong !',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text(
+                        '-5',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                // Message
-                Text(
-                  message,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.w500),
+                const SizedBox(height: 20),
+                // Answer comparison
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // User's answer
+                    Column(
+                      children: [
+                        const Text(
+                          'Your Answer',
+                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.red, width: 2),
+                          ),
+                          child: Text(
+                            '$userAnswer',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Correct answer
+                    Column(
+                      children: [
+                        const Text(
+                          'Correct Answer',
+                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.green, width: 2),
+                          ),
+                          child: Text(
+                            '$correctAnswer',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
-                // Retry and Next buttons
+                // Retry button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      setState(() {
+                        selectedAnswer = null;
+                        isCorrect = null;
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Try Again',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _goToNextRound() {
+    setState(() {
+      currentRound++;
+      selectedAnswer = null;
+      isCorrect = null;
+    });
+  }
+
+  void _showLevelCompletePopup() {
+    gameTimer?.cancel();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Trophy Icon
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.emoji_events,
+                    color: Colors.amber,
+                    size: 60,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Title
+                const Text(
+                  'Level Complete!',
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Level info
+                Text(
+                  'Level ${widget.level}',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Score display
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.purple.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Total Score',
+                        style: TextStyle(fontSize: 14, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$score',
+                        style: const TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.purple,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // Buttons
                 Row(
                   children: [
                     // Retry button
@@ -180,10 +391,14 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
-                          setState(() {
-                            selectedAnswer = null;
-                            isCorrect = null;
-                          });
+                          // Restart current level
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      EquationGameScreen(level: widget.level),
+                            ),
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
@@ -203,13 +418,11 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // Next button
-                    if (isCorrect == true)
+                    // Next Level button
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
-                          // Go to next level
                           int nextLevel = widget.level + 1;
                           if (nextLevel <= GameData.getTotalLevels()) {
                             Navigator.of(context).pushReplacement(
@@ -220,20 +433,22 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                               ),
                             );
                           } else {
-                            // No more levels, go back to home
+                            // All levels completed - go back to home
                             Navigator.of(context).pop();
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: color,
+                          backgroundColor: Colors.green,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
-                          'Next',
-                          style: TextStyle(
+                        child: Text(
+                          widget.level < GameData.getTotalLevels()
+                              ? 'Next'
+                              : 'Home',
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -288,7 +503,12 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                       // Pause button
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>PauseScreen()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PauseScreen(),
+                            ),
+                          );
                         },
                         child: Container(
                           width: 36,
@@ -415,7 +635,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                       ),
                       // Equation text on book
                       Text(
-                        gameLevel.equation,
+                        currentQuestion.equation,
                         style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -437,11 +657,15 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: _buildOptionButton(gameLevel.options[0]),
+                            child: _buildOptionButton(
+                              currentQuestion.options[0],
+                            ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
-                            child: _buildOptionButton(gameLevel.options[1]),
+                            child: _buildOptionButton(
+                              currentQuestion.options[1],
+                            ),
                           ),
                         ],
                       ),
@@ -450,11 +674,15 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: _buildOptionButton(gameLevel.options[2]),
+                            child: _buildOptionButton(
+                              currentQuestion.options[2],
+                            ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
-                            child: _buildOptionButton(gameLevel.options[3]),
+                            child: _buildOptionButton(
+                              currentQuestion.options[3],
+                            ),
                           ),
                         ],
                       ),
