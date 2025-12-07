@@ -4,10 +4,10 @@ import 'services/level_progress_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize level progress service before running the app
   await LevelProgressService.instance.initialize();
-  
+
   runApp(const MyApp());
 }
 

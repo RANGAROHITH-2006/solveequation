@@ -56,7 +56,7 @@ class _PauseScreenState extends State<PauseScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Restart Button
                   SizedBox(
                     width: double.infinity,
@@ -90,7 +90,7 @@ class _PauseScreenState extends State<PauseScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // How to play Button
                   SizedBox(
                     width: double.infinity,
@@ -123,7 +123,7 @@ class _PauseScreenState extends State<PauseScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Leave game Button
                   SizedBox(
                     width: double.infinity,
@@ -131,7 +131,9 @@ class _PauseScreenState extends State<PauseScreen> {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         // Leave game and go to home screen
-                        Navigator.of(context).popUntil((route) => route.isFirst);
+                        Navigator.of(
+                          context,
+                        ).popUntil((route) => route.isFirst);
                       },
                       icon: const Icon(
                         Icons.exit_to_app,
@@ -174,10 +176,7 @@ class _PauseScreenState extends State<PauseScreen> {
           ),
           title: const Text(
             'How to Play',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           content: const Column(
             mainAxisSize: MainAxisSize.min,

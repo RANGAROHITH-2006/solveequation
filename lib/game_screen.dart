@@ -709,10 +709,8 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                         ),
                       ),
 
-                     
                       Row(
                         children: [
-                         
                           Container(
                             width: 36,
                             height: 36,
@@ -738,14 +736,15 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                                 color: Colors.white.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child:Image.asset(
-                              'assets/images/help.png',
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container();
-                              },
+                              child: Image.asset(
+                                'assets/images/help.png',
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container();
+                                },
+                              ),
                             ),
-                          ),)
+                          ),
                         ],
                       ),
                     ],
