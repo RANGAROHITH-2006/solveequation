@@ -1,359 +1,424 @@
 import 'package:flutter/material.dart';
 import 'game_screen.dart';
 import 'game_data.dart';
+import 'services/level_progress_service.dart';
 
-class EquationGameHomeScreen extends StatelessWidget {
+class EquationGameHomeScreen extends StatefulWidget {
   const EquationGameHomeScreen({super.key});
+
+  @override
+  State<EquationGameHomeScreen> createState() => _EquationGameHomeScreenState();
+}
+
+class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
+  final LevelProgressService _progressService = LevelProgressService.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(
-        255,
-        32,
-        1,
-        52,
-      ), // Purple background
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Top section with navigation and game preview
-            Expanded(
-              flex: 5,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  children: [
-                    // Navigation bar
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          // Background image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/homeback.png',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(color: const Color.fromARGB(255, 32, 1, 52));
+              },
+            ),
+          ),
+          // Content
+          SafeArea(
+            child: Column(
+              children: [
+                // Top section with navigation and game preview
+                Expanded(
+                  flex: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
                       children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: const Icon(
-                              Icons.arrow_back_ios,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                        ),
+                        // Navigation bar
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             GestureDetector(
-                              onTap: () {
-                                // Help action
-                              },
+                              onTap: () => {},
                               child: Container(
                                 padding: const EdgeInsets.all(8.0),
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                                 child: const Icon(
-                                  Icons.help_outline,
+                                  Icons.arrow_back_ios,
                                   color: Colors.white,
-                                  size: 24,
+                                  size: 20,
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            GestureDetector(
-                              onTap: () {
-                                // Share action
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: const Icon(
-                                  Icons.share,
-                                  color: Colors.white,
-                                  size: 24,
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    // Help action
+                                  },
+                                  child: Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Image.asset(
+                                      'assets/images/help.png',
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (
+                                        context,
+                                        error,
+                                        stackTrace,
+                                      ) {
+                                        return Container();
+                                      },
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 8),
+                                GestureDetector(
+                                  onTap: () {
+                                    // Share action
+                                  },
+                                  child: Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Image.asset(
+                                      'assets/images/share.png',
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (
+                                        context,
+                                        error,
+                                        stackTrace,
+                                      ) {
+                                        return Container();
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                    // Game preview area - Equation display
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.only(top: 0.0),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // Equation display with book background
-                              Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  // Background book image
-                                  Image.asset(
-                                    'assets/svg/book.png',
-                                    width: 280,
-                                    height: 150,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  // Equation text on top of book
-                                  const Text(
-                                    '4 + 5 = ?',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                          
-                              const SizedBox(height: 16),
-                              // Answer options
-                              Row(
+                        // Game preview area - Equation display
+                        Expanded(
+                          child: Container(
+                            margin: const EdgeInsets.only(top: 0.0),
+                            child: SingleChildScrollView(
+                              child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Container(
-                                    width: 60,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF34C759),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Center(
-                                      child: Text(
-                                        '9',
+                                  // Equation display with book background
+                                  Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      // Background book image
+                                      Image.asset(
+                                        'assets/images/book.png',
+                                        width: 280,
+                                        height: 150,
+                                        fit: BoxFit.contain,
+                                      ),
+
+                                      const Text(
+                                        '4 + 5 = ?',
                                         style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
                                         ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 16),
-                                  Container(
-                                    width: 60,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF8E8E93),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Center(
-                                      child: Text(
-                                        '8',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
+
+                                  const SizedBox(height: 16),
+                                  // Answer options
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: 100,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF34C759),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: const Center(
+                                          child: Text(
+                                            '5',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
                                         ),
                                       ),
-                                    ),
+                                      const SizedBox(width: 16),
+                                      Container(
+                                        width: 100,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF8E8E93),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: const Center(
+                                          child: Text(
+                                            '1',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: 100,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF8E8E93),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: const Center(
+                                          child: Text(
+                                            '0',
+                                            style: TextStyle(
+                                              color: Color(0xFFFFFFFF),
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Container(
+                                        width: 100,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF8E8E93),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: const Center(
+                                          child: Text(
+                                            '9',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
-                              ),
-                              SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 60,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF8E8E93),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Center(
-                                      child: Text(
-                                        '9',
-                                        style: TextStyle(
-                                          color:  Color(0xFFFFFFFF),
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Container(
-                                    width: 60,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF8E8E93),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: const Center(
-                                      child: Text(
-                                        '8',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            // Bottom sheet
-            Expanded(
-              flex: 7,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32),
-                  ),
-                ),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Header section
-                        const Text(
-                          'Games',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFF007AFF),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Solve Equation',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // Levels section
-                        const Text(
-                          'Levels',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Level selector
-                        SizedBox(
-                          height: 80,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: GameData.getTotalLevels(), // Use dynamic level count
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 10.0),
-                                child: LevelItem(
-                                  levelNumber: index + 1,
-                                  isCompleted:
-                                      index < 3, // First 3 levels completed
-                                  isUnlocked:
-                                      index < 5, // First 5 levels unlocked
-                                  onTap: () {
-                                    // Navigate to level
-                                    _startEquationGame(context, index + 1);
-                                  },
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Benefits section
-                        const Text(
-                          'Benefits',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        const BenefitItem(
-                          icon: Icons.psychology_outlined,
-                          title: 'Math Skills Enhancement',
-                          description:
-                              'Improve your arithmetic and problem-solving abilities through engaging practice.',
-                        ),
-                        const SizedBox(height: 16),
-                        const BenefitItem(
-                          icon: Icons.flash_on_outlined,
-                          title: 'Logical Thinking',
-                          description:
-                              'Enhance your ability to think logically and understand mathematical patterns.',
-                        ),
-                        const SizedBox(height: 16),
-                        const BenefitItem(
-                          icon: Icons.timer_outlined,
-                          title: 'Quick Mental Calculations',
-                          description:
-                              'Boost the speed at which you perform mental arithmetic and solve equations.',
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Play Game button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Start game with level 1
-                              _startEquationGame(context, 1);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF007AFF),
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                            child: const Text(
-                              'Play Game',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Bottom sheet
+                Expanded(
+                  flex: 8,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(32),
+                        topRight: Radius.circular(32),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Header section
+                            const Text(
+                              'Games',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Color(0xFF007AFF),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Solve Equation',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+
+                            // Levels section
+                            const Text(
+                              'Levels',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
+                                color: Colors.black,
                               ),
                             ),
-                          ),
+                            const SizedBox(height: 16),
+
+                            // Level selector
+                            SizedBox(
+                              height: 80,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount:
+                                    GameData.getTotalLevels(), // Use dynamic level count
+                                itemBuilder: (context, index) {
+                                  final levelNumber = index + 1;
+                                  final isCompleted = _progressService
+                                      .isLevelCompleted(levelNumber);
+                                  final isUnlocked = _progressService
+                                      .isLevelUnlocked(levelNumber);
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 10.0),
+                                    child: LevelItem(
+                                      levelNumber: levelNumber,
+                                      isCompleted: isCompleted,
+                                      isUnlocked: isUnlocked,
+                                      onTap: () {
+                                        // Navigate to level
+                                        _startEquationGame(
+                                          context,
+                                          levelNumber,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Benefits section
+                            const Text(
+                              'Benefits',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            const BenefitItem(
+                              icon: Icons.psychology_outlined,
+                              title: 'Math Skills Enhancement',
+                              description:
+                                  'Improve your arithmetic and problem-solving abilities through engaging practice.',
+                            ),
+                            const SizedBox(height: 16),
+                            const BenefitItem(
+                              icon: Icons.flash_on_outlined,
+                              title: 'Logical Thinking',
+                              description:
+                                  'Enhance your ability to think logically and understand mathematical patterns.',
+                            ),
+                            const SizedBox(height: 16),
+                            const BenefitItem(
+                              icon: Icons.timer_outlined,
+                              title: 'Quick Mental Calculations',
+                              description:
+                                  'Boost the speed at which you perform mental arithmetic and solve equations.',
+                            ),
+
+                            const SizedBox(height: 24),
+
+                            // Play Game button
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  // Start game with level 1
+                                  _startEquationGame(context, 1);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF007AFF),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Play Game',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 32,
+                            ), // Add bottom padding for scroll
+                          ],
                         ),
-                        const SizedBox(
-                          height: 32,
-                        ), // Add bottom padding for scroll
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  void _startEquationGame(BuildContext context, int level) {
-    Navigator.push(
+  void _startEquationGame(BuildContext context, int level) async {
+    await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => EquationGameScreen(level: level)),
     );
+    // Refresh the UI when returning from the game to show updated progress
+    setState(() {});
   }
 }
 

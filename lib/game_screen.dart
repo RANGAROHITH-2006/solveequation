@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:solveequationgame/pause_screen.dart';
 import 'dart:async';
 import 'game_data.dart';
+import 'services/level_progress_service.dart';
 
 class EquationGameScreen extends StatefulWidget {
   final int level;
@@ -302,6 +303,11 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
 
   void _showLevelCompletePopup() {
     gameTimer?.cancel();
+
+    // Save level completion progress
+    final progressService = LevelProgressService.instance;
+    progressService.markLevelCompleted(widget.level, score: score);
+
     int countdown = 10;
     Timer? countdownTimer;
 
@@ -349,7 +355,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                     // Background image
                     Positioned.fill(
                       child: Image.asset(
-                        'assets/svg/background.png',
+                        'assets/images/background.png',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(color: const Color(0xFF1E0A32));
@@ -361,137 +367,139 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                       child: Column(
                         children: [
                           Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Pause button
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PauseScreen(),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
                             ),
-                          );
-                        },
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            isPaused ? Icons.play_arrow : Icons.pause,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
-                      ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Pause button
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PauseScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      isPaused ? Icons.play_arrow : Icons.pause,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
 
-                      // Level title
-                      Text(
-                        'Level ${widget.level}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                                // Level title
+                                Text(
+                                  'Level ${widget.level}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
 
-                      // Timer icon and help icon
-                      Row(
-                        children: [
-                          // Timer/Ad icon (red circle with play)
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFE53935),
-                              shape: BoxShape.circle,
+                                // Timer icon and help icon
+                                Row(
+                                  children: [
+                                    // Timer/Ad icon (red circle with play)
+                                    Container(
+                                      width: 36,
+                                      height: 36,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFE53935),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.play_arrow,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    // Help icon
+                                    GestureDetector(
+                                      onTap: () {
+                                        // Help action
+                                      },
+                                      child: Container(
+                                        width: 36,
+                                        height: 36,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.15),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.help_outline,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            child: const Icon(
-                              Icons.play_arrow,
-                              color: Colors.white,
-                              size: 20,
+                          ),
+
+                          // Round, Timer, and Score info
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 8,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Round info
+                                Text(
+                                  'Round $currentRound/7',
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                // Timer
+                                Text(
+                                  _formatTime(timeRemaining),
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                // Score
+                                Text(
+                                  'Score $score',
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          // Help icon
-                          GestureDetector(
-                            onTap: () {
-                              // Help action
-                            },
-                            child: Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.help_outline,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
 
-                // Round, Timer, and Score info
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 8,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Round info
-                      Text(
-                        'Round $currentRound/7',
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      // Timer
-                      Text(
-                        _formatTime(timeRemaining),
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      // Score
-                      Text(
-                        'Score $score',
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
                           const Spacer(flex: 1),
                           // Level Up Image
                           Image.asset(
-                            'assets/svg/completed.png',
+                            'assets/images/completed.png',
                             width: 250,
                             height: 200,
                             fit: BoxFit.contain,
@@ -646,7 +654,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
           // Background image
           Positioned.fill(
             child: Image.asset(
-              'assets/svg/background.png',
+              'assets/images/background.png',
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(color: const Color(0xFF1E0A32));
@@ -701,21 +709,19 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                         ),
                       ),
 
-                      // Timer icon and help icon
+                     
                       Row(
                         children: [
-                          // Timer/Ad icon (red circle with play)
+                         
                           Container(
                             width: 36,
                             height: 36,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFE53935),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.play_arrow,
-                              color: Colors.white,
-                              size: 20,
+                            child: Image.asset(
+                              'assets/images/add.png',
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container();
+                              },
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -725,19 +731,21 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                               // Help action
                             },
                             child: Container(
+                              padding: EdgeInsets.all(7),
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Icon(
-                                Icons.help_outline,
-                                color: Colors.white,
-                                size: 20,
-                              ),
+                              child:Image.asset(
+                              'assets/images/help.png',
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container();
+                              },
                             ),
-                          ),
+                          ),)
                         ],
                       ),
                     ],
@@ -794,7 +802,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                     children: [
                       // Book image
                       Image.asset(
-                        'assets/svg/book.png',
+                        'assets/images/book.png',
                         width: double.infinity,
                         height: 250,
                         fit: BoxFit.contain,
