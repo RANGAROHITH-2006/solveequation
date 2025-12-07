@@ -302,165 +302,331 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
 
   void _showLevelCompletePopup() {
     gameTimer?.cancel();
+    int countdown = 10;
+    Timer? countdownTimer;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Trophy Icon
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.emoji_events,
-                    color: Colors.amber,
-                    size: 60,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Title
-                const Text(
-                  'Level Complete!',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                // Level info
-                Text(
-                  'Level ${widget.level}',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Score display
-                Container(
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            // Start countdown timer
+            countdownTimer ??= Timer.periodic(const Duration(seconds: 1), (
+              timer,
+            ) {
+              if (countdown > 0) {
+                setDialogState(() {
+                  countdown--;
+                });
+              } else {
+                timer.cancel();
+                // Auto navigate to next level
+                Navigator.of(context).pop();
+                int nextLevel = widget.level + 1;
+                if (nextLevel <= GameData.getTotalLevels()) {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder:
+                          (context) => EquationGameScreen(level: nextLevel),
+                    ),
+                  );
+                } else {
+                  Navigator.of(context).pop();
+                }
+              }
+            });
+
+            return WillPopScope(
+              onWillPop: () async {
+                countdownTimer?.cancel();
+                return true;
+              },
+              child: Scaffold(
+                backgroundColor: Colors.transparent,
+                body: Stack(
+                  children: [
+                    // Background image
+                    Positioned.fill(
+                      child: Image.asset(
+                        'assets/svg/background.png',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(color: const Color(0xFF1E0A32));
+                        },
+                      ),
+                    ),
+                    // Content
+                    SafeArea(
+                      child: Column(
+                        children: [
+                          Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
+                    horizontal: 16,
                     vertical: 12,
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Total Score',
-                        style: TextStyle(fontSize: 14, color: Colors.black54),
+                      // Pause button
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PauseScreen(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            isPaused ? Icons.play_arrow : Icons.pause,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 4),
+
+                      // Level title
                       Text(
-                        '$score',
+                        'Level ${widget.level}',
                         style: const TextStyle(
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.purple,
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                      // Timer icon and help icon
+                      Row(
+                        children: [
+                          // Timer/Ad icon (red circle with play)
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFE53935),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.play_arrow,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Help icon
+                          GestureDetector(
+                            onTap: () {
+                              // Help action
+                            },
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.help_outline,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Round, Timer, and Score info
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Round info
+                      Text(
+                        'Round $currentRound/7',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      // Timer
+                      Text(
+                        _formatTime(timeRemaining),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      // Score
+                      Text(
+                        'Score $score',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
-                // Buttons
-                Row(
-                  children: [
-                    // Retry button
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          // Restart current level
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                                      EquationGameScreen(level: widget.level),
+
+                const SizedBox(height: 20),
+
+                          const Spacer(flex: 1),
+                          // Level Up Image
+                          Image.asset(
+                            'assets/svg/completed.png',
+                            width: 250,
+                            height: 200,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 200,
+                                height: 200,
+                                decoration: BoxDecoration(
+                                  color: Colors.amber.withOpacity(0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.emoji_events,
+                                  color: Colors.amber,
+                                  size: 100,
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 30),
+                          // Bottom card
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 24),
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E1E2E),
+                              borderRadius: BorderRadius.circular(24),
                             ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Great job! title
+                                const Text(
+                                  'Great job!',
+                                  style: TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                // Your Score label
+                                const Text(
+                                  'Your Score',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                // Score with medal icon
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.workspace_premium,
+                                      color: Colors.amber,
+                                      size: 36,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '$score',
+                                      style: const TextStyle(
+                                        fontSize: 48,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 24),
+                                // Next Level button
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      countdownTimer?.cancel();
+                                      Navigator.of(context).pop();
+                                      int nextLevel = widget.level + 1;
+                                      if (nextLevel <=
+                                          GameData.getTotalLevels()) {
+                                        Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                            builder:
+                                                (context) => EquationGameScreen(
+                                                  level: nextLevel,
+                                                ),
+                                          ),
+                                        );
+                                      } else {
+                                        Navigator.of(context).pop();
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF3B82F6),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      widget.level < GameData.getTotalLevels()
+                                          ? 'Next Level'
+                                          : 'Home',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                // Countdown text
+                                Text(
+                                  'Next level starts in ${countdown.toString().padLeft(2, '0')} : ${(countdown % 60).toString().padLeft(2, '0')}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.white54,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        child: const Text(
-                          'Retry',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Next Level button
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          int nextLevel = widget.level + 1;
-                          if (nextLevel <= GameData.getTotalLevels()) {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder:
-                                    (context) =>
-                                        EquationGameScreen(level: nextLevel),
-                              ),
-                            );
-                          } else {
-                            // All levels completed - go back to home
-                            Navigator.of(context).pop();
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          widget.level < GameData.getTotalLevels()
-                              ? 'Next'
-                              : 'Home',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+                          const Spacer(flex: 1),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
