@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'game_screen.dart';
 import 'game_data.dart';
 import 'services/level_progress_service.dart';
+import 'utils/help_dialog.dart';
 
 class EquationGameHomeScreen extends StatefulWidget {
   const EquationGameHomeScreen({super.key});
@@ -65,7 +67,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                               children: [
                                 GestureDetector(
                                   onTap: () {
-                                    // Help action
+                                    showHelpDialog(context);
                                   },
                                   child: Container(
                                     width: 36,
@@ -91,7 +93,10 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                 const SizedBox(width: 8),
                                 GestureDetector(
                                   onTap: () {
-                                    // Share action
+                                    Share.share(
+                                      'Check out Solve Equation Game! Test your math skills and solve equations quickly. Download now!',
+                                      subject: 'Play Solve Equation Game',
+                                    );
                                   },
                                   child: Container(
                                     width: 36,
