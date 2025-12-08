@@ -64,9 +64,8 @@ class _PauseScreenState extends State<PauseScreen> {
                     height: 50,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // Restart game logic
-                        Navigator.pop(context);
-                        // Add restart game logic here
+                        // Return 'restart' signal to game screen
+                        Navigator.pop(context, 'restart');
                       },
                       icon: const Icon(
                         Icons.refresh,

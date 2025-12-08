@@ -113,15 +113,19 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
       setState(() {
         score += 10;
       });
+      
+      // Show correct animation
+      _showCorrectAnimation();
+      
       // Check if this was the last round
       if (currentRound >= GameData.roundsPerLevel) {
-        // Level completed - show completion popup
-        Future.delayed(const Duration(milliseconds: 500), () {
+        // Level completed - show completion popup after animation
+        Future.delayed(const Duration(milliseconds: 1500), () {
           _showLevelCompletePopup();
         });
       } else {
-        // Auto proceed to next round after a brief delay
-        Future.delayed(const Duration(milliseconds: 500), () {
+        // Auto proceed to next round after animation
+        Future.delayed(const Duration(milliseconds: 1500), () {
           _goToNextRound();
         });
       }
@@ -134,6 +138,24 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
       // Show wrong answer popup with both answers
       _showWrongAnswerPopup(answer, currentQuestion.correctAnswer);
     }
+  }
+
+  void _showCorrectAnimation() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return _CorrectAnimationOverlay();
+      },
+    );
+
+    // Auto close after 1.2 seconds
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+    });
   }
 
   void _showWrongAnswerPopup(int userAnswer, int correctAnswer) {
@@ -302,6 +324,19 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
     });
   }
 
+  void _restartLevel() {
+    setState(() {
+      currentRound = 1;
+      score = 0;
+      timeRemaining = gameLevel.timeLimit;
+      selectedAnswer = null;
+      isCorrect = null;
+    });
+    // Restart the timer
+    gameTimer?.cancel();
+    _startTimer();
+  }
+
   void _showLevelCompletePopup() {
     gameTimer?.cancel();
 
@@ -357,13 +392,16 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                     children: [
                       // Pause button
                       GestureDetector(
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => PauseScreen(),
                             ),
                           );
+                          if (result == 'restart') {
+                            _restartLevel();
+                          }
                         },
                         child: Container(
                           width: 36,
@@ -698,6 +736,33 @@ class _LevelCompleteDialogState extends State<_LevelCompleteDialog> {
             SafeArea(
               child: Column(
                 children: [
+                  // Close button at top right
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16, right: 16),
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: GestureDetector(
+                        onTap: () {
+                          countdownTimer?.cancel();
+                          Navigator.of(context).pop();
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   const Spacer(flex: 1),
                   // Level Up Image
                   Image.asset(
@@ -819,6 +884,92 @@ class _LevelCompleteDialogState extends State<_LevelCompleteDialog> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// Correct Answer Animation Overlay
+class _CorrectAnimationOverlay extends StatefulWidget {
+  @override
+  State<_CorrectAnimationOverlay> createState() => _CorrectAnimationOverlayState();
+}
+
+class _CorrectAnimationOverlayState extends State<_CorrectAnimationOverlay>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+
+    _scaleAnimation = Tween<double>(begin: 0.0, end: 1.2).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
+      ),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.3, curve: Curves.easeIn),
+      ),
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: Center(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Opacity(
+              opacity: _fadeAnimation.value,
+              child: Transform.scale(
+                scale: _scaleAnimation.value,
+                child: Image.asset(
+                  'assets/images/correct.png',
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    // Fallback to icon if image not found
+                    return Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.9),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.check_circle,
+                        color: Colors.white,
+                        size: 120,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
