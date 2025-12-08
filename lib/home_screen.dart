@@ -12,6 +12,7 @@ class EquationGameHomeScreen extends StatefulWidget {
 
 class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
   final LevelProgressService _progressService = LevelProgressService.instance;
+  int? selectedLevel; // Track the selected level
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +149,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                     ],
                                   ),
 
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: 12),
                                   // Answer options
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -243,6 +244,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                       ),
                                     ],
                                   ),
+                                
                                 ],
                               ),
                             ),
@@ -265,7 +267,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                     ),
                     child: SingleChildScrollView(
                       child: Padding(
-                        padding: const EdgeInsets.all(24.0),
+                        padding: const EdgeInsets.all(20.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -302,7 +304,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
 
                             // Level selector
                             SizedBox(
-                              height: 80,
+                              height: 90,
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
                                 itemCount:
@@ -320,12 +322,12 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                       levelNumber: levelNumber,
                                       isCompleted: isCompleted,
                                       isUnlocked: isUnlocked,
+                                      isSelected: selectedLevel == levelNumber,
                                       onTap: () {
-                                        // Navigate to level
-                                        _startEquationGame(
-                                          context,
-                                          levelNumber,
-                                        );
+                                        // Select level instead of navigating
+                                        setState(() {
+                                          selectedLevel = levelNumber;
+                                        });
                                       },
                                     ),
                                   );
@@ -369,26 +371,32 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
 
                             const SizedBox(height: 24),
 
-                            // Play Game button
+                            // Start button (requires level selection)
                             SizedBox(
                               width: double.infinity,
                               height: 56,
                               child: ElevatedButton(
-                                onPressed: () {
-                                  // Start game with level 1
-                                  _startEquationGame(context, 1);
-                                },
+                                onPressed: selectedLevel != null
+                                    ? () {
+                                        // Start game with selected level
+                                        _startEquationGame(context, selectedLevel!);
+                                      }
+                                    : null, // Disable if no level selected
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF007AFF),
                                   foregroundColor: Colors.white,
+                                  disabledBackgroundColor: Colors.grey,
+                                  disabledForegroundColor: Colors.white60,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                 ),
-                                child: const Text(
-                                  'Play Game',
-                                  style: TextStyle(
+                                child: Text(
+                                  selectedLevel != null
+                                      ? 'Start Level $selectedLevel'
+                                      : 'Select a Level to Start',
+                                  style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -426,6 +434,7 @@ class LevelItem extends StatelessWidget {
   final int levelNumber;
   final bool isCompleted;
   final bool isUnlocked;
+  final bool isSelected;
   final VoidCallback? onTap;
 
   const LevelItem({
@@ -433,6 +442,7 @@ class LevelItem extends StatelessWidget {
     required this.levelNumber,
     required this.isCompleted,
     required this.isUnlocked,
+    this.isSelected = false,
     this.onTap,
   });
 
@@ -443,8 +453,8 @@ class LevelItem extends StatelessWidget {
     if (isCompleted) {
       // Completed level - green check
       icon = Container(
-        width: 48,
-        height: 48,
+        width: 40,
+        height: 40,
         decoration: const BoxDecoration(
           color: Color(0xFF34C759),
           shape: BoxShape.rectangle,
@@ -455,8 +465,8 @@ class LevelItem extends StatelessWidget {
     } else if (isUnlocked) {
       // Playable level - blue play
       icon = Container(
-        width: 48,
-        height: 48,
+        width: 40,
+        height: 40,
         decoration: const BoxDecoration(
           color: Color(0xFF007AFF),
           shape: BoxShape.rectangle,
@@ -467,8 +477,8 @@ class LevelItem extends StatelessWidget {
     } else {
       // Locked level - grey lock
       icon = Container(
-        width: 48,
-        height: 48,
+        width: 40,
+        height: 40,
         decoration: const BoxDecoration(
           color: Color(0xFFD1D1D6),
           shape: BoxShape.rectangle,
@@ -480,19 +490,28 @@ class LevelItem extends StatelessWidget {
 
     return GestureDetector(
       onTap: isUnlocked ? onTap : null,
-      child: Column(
-        children: [
-          icon,
-          const SizedBox(height: 8),
-          Text(
-            '$levelNumber',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
+      child: Container(
+        decoration: BoxDecoration(
+          border: isSelected
+              ? Border.all(color: const Color(0xFF007AFF), width: 3)
+              : null,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        padding: const EdgeInsets.all(4),
+        child: Column(
+          children: [
+            icon,
+            const SizedBox(height: 4),
+            Text(
+              '$levelNumber',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? const Color(0xFF007AFF) : Colors.black,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
