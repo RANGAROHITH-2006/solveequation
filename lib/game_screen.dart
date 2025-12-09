@@ -93,7 +93,113 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
 
   void _gameOver() {
     gameTimer?.cancel();
-    // Handle game over logic
+    _showTimeUpPopup();
+  }
+
+  void _showTimeUpPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 39, 13, 65).withOpacity(0.9),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Icon
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.timer_off, color: Colors.red, size: 50),
+                ),
+                const SizedBox(height: 16),
+                // Title
+                const Text(
+                  'Oops!',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Time Completed',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white70,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // Retry button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _restartLevel();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Retry',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Home button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2E1A47),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Home',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -113,10 +219,10 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
       setState(() {
         score += 10;
       });
-      
+
       // Show correct animation
       _showCorrectAnimation();
-      
+
       // Check if this was the last round
       if (currentRound >= GameData.roundsPerLevel) {
         // Level completed - show completion popup after animation
@@ -170,7 +276,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color.fromARGB(255, 39, 13, 65),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -230,7 +336,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                       children: [
                         const Text(
                           'Your Answer',
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                          style: TextStyle(fontSize: 14, color: Colors.white),
                         ),
                         const SizedBox(height: 8),
                         Container(
@@ -256,7 +362,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                       children: [
                         const Text(
                           'Correct Answer',
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                          style: TextStyle(fontSize: 14, color: Colors.white),
                         ),
                         const SizedBox(height: 8),
                         Container(
@@ -348,10 +454,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return _LevelCompleteDialog(
-          level: widget.level,
-          score: score,
-        );
+        return _LevelCompleteDialog(level: widget.level, score: score);
       },
     );
   }
@@ -393,12 +496,18 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                       // Pause button
                       GestureDetector(
                         onTap: () async {
+                          setState(() {
+                            isPaused = true;
+                          });
                           final result = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => PauseScreen(),
                             ),
                           );
+                          setState(() {
+                            isPaused = false;
+                          });
                           if (result == 'restart') {
                             _restartLevel();
                           }
@@ -659,10 +768,7 @@ class _LevelCompleteDialog extends StatefulWidget {
   final int level;
   final int score;
 
-  const _LevelCompleteDialog({
-    required this.level,
-    required this.score,
-  });
+  const _LevelCompleteDialog({required this.level, required this.score});
 
   @override
   State<_LevelCompleteDialog> createState() => _LevelCompleteDialogState();
@@ -811,10 +917,7 @@ class _LevelCompleteDialogState extends State<_LevelCompleteDialog> {
                         // Your Score label
                         const Text(
                           'Your Score',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white70,
-                          ),
+                          style: TextStyle(fontSize: 16, color: Colors.white70),
                         ),
                         const SizedBox(height: 8),
                         // Score with medal icon
@@ -848,9 +951,7 @@ class _LevelCompleteDialogState extends State<_LevelCompleteDialog> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF3B82F6),
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 16,
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
@@ -893,7 +994,8 @@ class _LevelCompleteDialogState extends State<_LevelCompleteDialog> {
 // Correct Answer Animation Overlay
 class _CorrectAnimationOverlay extends StatefulWidget {
   @override
-  State<_CorrectAnimationOverlay> createState() => _CorrectAnimationOverlayState();
+  State<_CorrectAnimationOverlay> createState() =>
+      _CorrectAnimationOverlayState();
 }
 
 class _CorrectAnimationOverlayState extends State<_CorrectAnimationOverlay>
