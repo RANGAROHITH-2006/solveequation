@@ -328,7 +328,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                 color: Colors.black,
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 8),
 
                             // Level selector
                             SizedBox(
@@ -345,7 +345,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                       .isLevelUnlocked(levelNumber);
 
                                   return Padding(
-                                    padding: const EdgeInsets.only(right: 10.0),
+                                    padding: const EdgeInsets.only(right: 8.0),
                                     child: LevelItem(
                                       levelNumber: levelNumber,
                                       isCompleted: isCompleted,
@@ -363,7 +363,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                               ),
                             ),
 
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 8),
 
                             // Benefits section
                             const Text(
@@ -485,10 +485,14 @@ class LevelItem extends StatelessWidget {
       icon = Container(
         width: 40,
         height: 40,
-        decoration: const BoxDecoration(
-          color: Color(0xFF34C759),
+        decoration: BoxDecoration(
+          color: isSelected ? Color(0xFF34C759) : Color(0xFF34C759).withOpacity(0.4),
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.all(Radius.circular(12)),
+          border: Border.all(
+            color: isSelected ? Colors.green : Colors.transparent,
+            width: 3,
+          ),
         ),
         child: const Icon(Icons.check, color: Colors.white, size: 24),
       );
@@ -497,10 +501,14 @@ class LevelItem extends StatelessWidget {
       icon = Container(
         width: 40,
         height: 40,
-        decoration: const BoxDecoration(
-          color: Color(0xFF007AFF),
+        decoration: BoxDecoration(
+          color: isSelected ?  Color(0xFF007AFF) : Color(0xFF007AFF).withOpacity(0.4),
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.all(Radius.circular(12)),
+          border: Border.all(
+            color: isSelected ? Colors.blue : Colors.transparent,
+            width: 3,
+          ),
         ),
         child: const Icon(Icons.play_arrow, color: Colors.white, size: 24),
       );
@@ -521,12 +529,6 @@ class LevelItem extends StatelessWidget {
     return GestureDetector(
       onTap: isUnlocked ? onTap : null,
       child: Container(
-        decoration: BoxDecoration(
-          border: isSelected
-              ? Border.all(color: const Color(0xFF007AFF), width: 3)
-              : null,
-          borderRadius: BorderRadius.circular(16),
-        ),
         padding: const EdgeInsets.all(4),
         child: Column(
           children: [
@@ -537,7 +539,7 @@ class LevelItem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-                color: isSelected ? const Color(0xFF007AFF) : Colors.black,
+                color: Colors.black,
               ),
             ),
           ],
