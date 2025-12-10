@@ -15,10 +15,29 @@ class EquationGameHomeScreen extends StatefulWidget {
 class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
   final LevelProgressService _progressService = LevelProgressService.instance;
   int? selectedLevel; // Track the selected level
+  bool showing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set the default selected level to the highest unlocked level
+    _setDefaultSelectedLevel();
+  }
+
+  void _setDefaultSelectedLevel() {
+    final highestCompleted = _progressService.getHighestLevelCompleted();
+    // Select the next level after the highest completed, or level 1 if none completed
+    selectedLevel = highestCompleted + 1;
+    // Make sure we don't exceed total levels
+    if (selectedLevel! > GameData.getTotalLevels()) {
+      selectedLevel = GameData.getTotalLevels();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // Background image
@@ -93,10 +112,14 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                 const SizedBox(width: 8),
                                 GestureDetector(
                                   onTap: () {
+                                    setState(() {
+                                      showing = !showing;
+                                    });
+                                    if (showing){
                                     Share.share(
                                       'Check out Solve Equation Game! Test your math skills and solve equations quickly. Download now!',
                                       subject: 'Play Solve Equation Game',
-                                    );
+                                    );}
                                   },
                                   child: Container(
                                     width: 36,
@@ -170,7 +193,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                         ),
                                         child: const Center(
                                           child: Text(
-                                            '5',
+                                            '9',
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 18,
@@ -238,7 +261,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                         ),
                                         child: const Center(
                                           child: Text(
-                                            '9',
+                                            '5',
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 18,
@@ -431,7 +454,9 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
       MaterialPageRoute(builder: (context) => EquationGameScreen(level: level)),
     );
     // Refresh the UI when returning from the game to show updated progress
-    setState(() {});
+    setState(() {
+      _setDefaultSelectedLevel(); // Update selected level after returning
+    });
   }
 }
 

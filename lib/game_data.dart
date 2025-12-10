@@ -13,12 +13,14 @@ class GameQuestion {
 class GameLevel {
   final int level;
   final List<GameQuestion> questions; // 7 questions per level
+  final List<GameQuestion> questionPool; // Pool of 30 questions for wrong answers
   final int timeLimit; // in seconds
   final int pointsPerCorrect;
 
   const GameLevel({
     required this.level,
     required this.questions,
+    required this.questionPool,
     this.timeLimit = 60,
     this.pointsPerCorrect = 10,
   });
@@ -33,12 +35,19 @@ class GameData {
       level: 1,
       questions: [
         GameQuestion(equation: "2 + 5 = ?", correctAnswer: 7, options: [5, 7, 9, 11]),
-        GameQuestion(equation: "3 + 4 = ?", correctAnswer: 7, options: [6, 7, 8, 9]),
+        GameQuestion(equation: "3 + 4 = ?", correctAnswer: 7, options: [6, 8, 7, 9]),
         GameQuestion(equation: "8 + 2 = ?", correctAnswer: 10, options: [8, 9, 10, 11]),
         GameQuestion(equation: "5 + 6 = ?", correctAnswer: 11, options: [10, 11, 12, 13]),
         GameQuestion(equation: "9 + 3 = ?", correctAnswer: 12, options: [11, 12, 13, 14]),
-        GameQuestion(equation: "7 + 5 = ?", correctAnswer: 12, options: [10, 11, 12, 13]),
-        GameQuestion(equation: "4 + 8 = ?", correctAnswer: 12, options: [10, 11, 12, 14]),
+        GameQuestion(equation: "7 + 20 = ?", correctAnswer: 27, options: [24, 25, 26, 27]),
+        GameQuestion(equation: "4 + 8 = ?", correctAnswer: 12, options: [10, 11, 14, 12]),
+      ],
+      questionPool: [
+        GameQuestion(equation: "1 + 1 = ?", correctAnswer: 2, options: [1, 2, 3, 4]),
+        GameQuestion(equation: "6 + 3 = ?", correctAnswer: 9, options: [7, 8, 9, 10]),
+        GameQuestion(equation: "7 + 7 = ?", correctAnswer: 14, options: [12, 13, 14, 15]),
+        GameQuestion(equation: "4 + 5 = ?", correctAnswer: 9, options: [7, 8, 9, 10]),
+        GameQuestion(equation: "8 + 6 = ?", correctAnswer: 14, options: [12, 13, 14, 15]),
       ],
     ),
 
@@ -54,6 +63,13 @@ class GameData {
         GameQuestion(equation: "14 - 6 = ?", correctAnswer: 8, options: [6, 7, 8, 9]),
         GameQuestion(equation: "16 - 9 = ?", correctAnswer: 7, options: [5, 6, 7, 8]),
       ],
+      questionPool: [
+        GameQuestion(equation: "8 - 3 = ?", correctAnswer: 5, options: [4, 5, 6, 7]),
+        GameQuestion(equation: "17 - 9 = ?", correctAnswer: 8, options: [6, 7, 8, 9]),
+        GameQuestion(equation: "13 - 4 = ?", correctAnswer: 9, options: [7, 8, 9, 10]),
+        GameQuestion(equation: "11 - 4 = ?", correctAnswer: 7, options: [5, 6, 7, 8]),
+        GameQuestion(equation: "19 - 10 = ?", correctAnswer: 9, options: [7, 8, 9, 10]),
+      ],
     ),
 
     // Level 3 - Basic Multiplication
@@ -67,6 +83,13 @@ class GameData {
         GameQuestion(equation: "5 × 5 = ?", correctAnswer: 25, options: [20, 25, 30, 35]),
         GameQuestion(equation: "8 × 3 = ?", correctAnswer: 24, options: [21, 24, 27, 30]),
         GameQuestion(equation: "7 × 4 = ?", correctAnswer: 28, options: [24, 26, 28, 32]),
+      ],
+      questionPool: [
+        GameQuestion(equation: "3 × 3 = ?", correctAnswer: 9, options: [6, 8, 9, 12]),
+        GameQuestion(equation: "9 × 3 = ?", correctAnswer: 27, options: [21, 24, 27, 30]),
+        GameQuestion(equation: "7 × 6 = ?", correctAnswer: 42, options: [36, 40, 42, 48]),
+        GameQuestion(equation: "4 × 7 = ?", correctAnswer: 28, options: [24, 26, 28, 32]),
+        GameQuestion(equation: "9 × 5 = ?", correctAnswer: 45, options: [40, 42, 45, 50]),
       ],
     ),
 
@@ -82,6 +105,13 @@ class GameData {
         GameQuestion(equation: "56 ÷ 7 = ?", correctAnswer: 8, options: [6, 7, 8, 9]),
         GameQuestion(equation: "72 ÷ 9 = ?", correctAnswer: 8, options: [6, 7, 8, 9]),
       ],
+      questionPool: [
+        GameQuestion(equation: "18 ÷ 2 = ?", correctAnswer: 9, options: [7, 8, 9, 10]),
+        GameQuestion(equation: "18 ÷ 3 = ?", correctAnswer: 6, options: [5, 6, 7, 8]),
+        GameQuestion(equation: "28 ÷ 4 = ?", correctAnswer: 7, options: [6, 7, 8, 9]),
+        GameQuestion(equation: "35 ÷ 5 = ?", correctAnswer: 7, options: [6, 7, 8, 9]),
+        GameQuestion(equation: "42 ÷ 6 = ?", correctAnswer: 7, options: [6, 7, 8, 9]),
+      ],
     ),
 
     // Level 5 - Mixed Operations (Easy)
@@ -95,6 +125,13 @@ class GameData {
         GameQuestion(equation: "33 + 27 = ?", correctAnswer: 60, options: [55, 58, 60, 62]),
         GameQuestion(equation: "50 - 23 = ?", correctAnswer: 27, options: [25, 27, 29, 31]),
         GameQuestion(equation: "9 × 8 = ?", correctAnswer: 72, options: [64, 72, 80, 81]),
+      ],
+      questionPool: [
+        GameQuestion(equation: "28 + 35 = ?", correctAnswer: 63, options: [59, 61, 63, 65]),
+        GameQuestion(equation: "42 - 25 = ?", correctAnswer: 17, options: [15, 17, 19, 21]),
+        GameQuestion(equation: "8 × 5 = ?", correctAnswer: 40, options: [35, 40, 45, 50]),
+        GameQuestion(equation: "54 ÷ 6 = ?", correctAnswer: 9, options: [7, 8, 9, 10]),
+        GameQuestion(equation: "19 + 32 = ?", correctAnswer: 51, options: [49, 51, 53, 55]),
       ],
     ),
 
@@ -110,6 +147,13 @@ class GameData {
         GameQuestion(equation: "57 + 66 = ?", correctAnswer: 123, options: [119, 121, 123, 125]),
         GameQuestion(equation: "94 + 28 = ?", correctAnswer: 122, options: [118, 120, 122, 124]),
       ],
+      questionPool: [
+        GameQuestion(equation: "54 + 39 = ?", correctAnswer: 93, options: [89, 91, 93, 95]),
+        GameQuestion(equation: "43 + 58 = ?", correctAnswer: 101, options: [97, 99, 101, 103]),
+        GameQuestion(equation: "71 + 52 = ?", correctAnswer: 123, options: [119, 121, 123, 125]),
+        GameQuestion(equation: "88 + 46 = ?", correctAnswer: 134, options: [130, 132, 134, 136]),
+        GameQuestion(equation: "69 + 47 = ?", correctAnswer: 116, options: [112, 114, 116, 118]),
+      ],
     ),
 
     // Level 7 - Multiplication (Medium)
@@ -123,6 +167,13 @@ class GameData {
         GameQuestion(equation: "8 × 12 = ?", correctAnswer: 96, options: [88, 92, 96, 104]),
         GameQuestion(equation: "6 × 15 = ?", correctAnswer: 90, options: [84, 88, 90, 95]),
         GameQuestion(equation: "9 × 11 = ?", correctAnswer: 99, options: [90, 95, 99, 108]),
+      ],
+      questionPool: [
+        GameQuestion(equation: "8 × 9 = ?", correctAnswer: 72, options: [64, 68, 72, 81]),
+        GameQuestion(equation: "11 × 6 = ?", correctAnswer: 66, options: [60, 63, 66, 72]),
+        GameQuestion(equation: "9 × 12 = ?", correctAnswer: 108, options: [96, 102, 108, 120]),
+        GameQuestion(equation: "7 × 13 = ?", correctAnswer: 91, options: [84, 88, 91, 98]),
+        GameQuestion(equation: "11 × 11 = ?", correctAnswer: 121, options: [110, 115, 121, 132]),
       ],
     ),
 
@@ -138,6 +189,13 @@ class GameData {
         GameQuestion(equation: "78 ÷ 6 = ?", correctAnswer: 13, options: [11, 12, 13, 14]),
         GameQuestion(equation: "91 ÷ 7 = ?", correctAnswer: 13, options: [11, 12, 13, 14]),
       ],
+      questionPool: [
+        GameQuestion(equation: "88 ÷ 8 = ?", correctAnswer: 11, options: [9, 10, 11, 12]),
+        GameQuestion(equation: "132 ÷ 11 = ?", correctAnswer: 12, options: [10, 11, 12, 13]),
+        GameQuestion(equation: "117 ÷ 9 = ?", correctAnswer: 13, options: [11, 12, 13, 14]),
+        GameQuestion(equation: "168 ÷ 12 = ?", correctAnswer: 14, options: [12, 13, 14, 15]),
+        GameQuestion(equation: "105 ÷ 7 = ?", correctAnswer: 15, options: [13, 14, 15, 16]),
+      ],
     ),
 
     // Level 9 - Mixed Operations (Hard)
@@ -152,6 +210,13 @@ class GameData {
         GameQuestion(equation: "125 - 58 = ?", correctAnswer: 67, options: [63, 65, 67, 69]),
         GameQuestion(equation: "15 × 9 = ?", correctAnswer: 135, options: [125, 130, 135, 145]),
       ],
+      questionPool: [
+        GameQuestion(equation: "82 + 69 = ?", correctAnswer: 151, options: [147, 149, 151, 153]),
+        GameQuestion(equation: "137 - 68 = ?", correctAnswer: 69, options: [67, 69, 71, 73]),
+        GameQuestion(equation: "13 × 8 = ?", correctAnswer: 104, options: [96, 100, 104, 112]),
+        GameQuestion(equation: "168 ÷ 12 = ?", correctAnswer: 14, options: [12, 13, 14, 15]),
+        GameQuestion(equation: "14 × 9 = ?", correctAnswer: 126, options: [117, 121, 126, 135]),
+      ],
     ),
 
     // Level 10 - Challenge Level
@@ -165,6 +230,13 @@ class GameData {
         GameQuestion(equation: "178 + 294 = ?", correctAnswer: 472, options: [462, 468, 472, 478]),
         GameQuestion(equation: "18 × 17 = ?", correctAnswer: 306, options: [289, 298, 306, 324]),
         GameQuestion(equation: "324 ÷ 18 = ?", correctAnswer: 18, options: [16, 17, 18, 19]),
+      ],
+      questionPool: [
+        GameQuestion(equation: "467 + 358 = ?", correctAnswer: 825, options: [815, 820, 825, 830]),
+        GameQuestion(equation: "725 - 486 = ?", correctAnswer: 239, options: [233, 236, 239, 242]),
+        GameQuestion(equation: "23 × 14 = ?", correctAnswer: 322, options: [308, 315, 322, 336]),
+        GameQuestion(equation: "384 ÷ 16 = ?", correctAnswer: 24, options: [22, 23, 24, 25]),
+        GameQuestion(equation: "27 × 15 = ?", correctAnswer: 405, options: [390, 398, 405, 420]),
       ],
     ),
   ];

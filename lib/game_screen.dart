@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:solveequationgame/pause_screen.dart';
 import 'dart:async';
+import 'dart:math';
 import 'game_data.dart';
 import 'services/level_progress_service.dart';
 import 'utils/help_dialog.dart';
@@ -16,6 +17,7 @@ class EquationGameScreen extends StatefulWidget {
 
 class _EquationGameScreenState extends State<EquationGameScreen> {
   late GameLevel gameLevel;
+  late List<GameQuestion> currentQuestions; // Mutable copy of questions
   int currentRound = 1;
   int score = 0;
   int timeRemaining = 60;
@@ -23,9 +25,12 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
   bool isPaused = false;
   int? selectedAnswer;
   bool? isCorrect;
+  bool isWrongAnswerDialogOpen = false; // Track if wrong answer dialog is open
+  List<int> usedQuestionIndices = []; // Track used questions from the pool
+  final Random _random = Random(); // Random generator for selecting questions
 
   // Get current question based on round
-  GameQuestion get currentQuestion => gameLevel.questions[currentRound - 1];
+  GameQuestion get currentQuestion => currentQuestions[currentRound - 1];
 
   @override
   void initState() {
@@ -36,9 +41,45 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
 
   void _initializeGame() {
     gameLevel = GameData.getLevelData(widget.level) ?? GameData.levels.first;
+    currentQuestions = List.from(gameLevel.questions); // Create mutable copy
     timeRemaining = gameLevel.timeLimit;
     currentRound = 1;
     score = 0;
+    usedQuestionIndices.clear(); // Clear used questions when initializing
+  }
+
+  /// Get a random unused question from the question pool
+  GameQuestion _getRandomQuestionFromPool() {
+    // If we've used all questions, reset the pool
+    if (usedQuestionIndices.length >= gameLevel.questionPool.length) {
+      usedQuestionIndices.clear();
+    }
+    
+    // Find an unused question
+    int questionIndex;
+    do {
+      questionIndex = _random.nextInt(gameLevel.questionPool.length);
+    } while (usedQuestionIndices.contains(questionIndex));
+    
+    // Mark this question as used
+    usedQuestionIndices.add(questionIndex);
+    
+    return gameLevel.questionPool[questionIndex];
+  }
+
+  /// Replace current question with a new one from the pool
+  void _replaceWithNewQuestion() {
+    // Get a new question from the pool
+    final newQuestion = _getRandomQuestionFromPool();
+    
+    // Replace the current round's question with the new one
+    currentQuestions[currentRound - 1] = newQuestion;
+    
+    // Reset selection state
+    setState(() {
+      selectedAnswer = null;
+      isCorrect = null;
+    });
   }
 
   void _startTimer() {
@@ -93,6 +134,11 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
 
   void _gameOver() {
     gameTimer?.cancel();
+    // Close wrong answer dialog if it's open
+    if (isWrongAnswerDialogOpen) {
+      Navigator.of(context, rootNavigator: true).pop();
+      isWrongAnswerDialogOpen = false;
+    }
     _showTimeUpPopup();
   }
 
@@ -265,6 +311,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
   }
 
   void _showWrongAnswerPopup(int userAnswer, int correctAnswer) {
+    isWrongAnswerDialogOpen = true; // Mark dialog as open
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -306,24 +353,24 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        '-5',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
+                    // Container(
+                    //   padding: const EdgeInsets.symmetric(
+                    //     horizontal: 8,
+                    //     vertical: 4,
+                    //   ),
+                    //   decoration: BoxDecoration(
+                    //     color: Colors.red.withOpacity(0.2),
+                    //     borderRadius: BorderRadius.circular(8),
+                    //   ),
+                    //   child: const Text(
+                    //     '-5',
+                    //     style: TextStyle(
+                    //       fontSize: 18,
+                    //       fontWeight: FontWeight.bold,
+                    //       color: Colors.red,
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -386,26 +433,25 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                // Retry button
+                // Next button (changed from Try Again)
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
+                      isWrongAnswerDialogOpen = false; // Mark dialog as closed
                       Navigator.of(context).pop();
-                      setState(() {
-                        selectedAnswer = null;
-                        isCorrect = null;
-                      });
+                      // Replace with a new question from the pool
+                      _replaceWithNewQuestion();
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: Colors.orange,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: const Text(
-                      'Try Again',
+                      'Next',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -437,7 +483,10 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
       timeRemaining = gameLevel.timeLimit;
       selectedAnswer = null;
       isCorrect = null;
+      usedQuestionIndices.clear(); // Clear used questions on restart
     });
+    // Reinitialize the game to reset questions
+    _initializeGame();
     // Restart the timer
     gameTimer?.cancel();
     _startTimer();
