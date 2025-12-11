@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:solveequationgame/pause_screen.dart';
 import 'dart:async';
 import 'dart:math';
@@ -261,6 +262,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
     });
 
     if (isCorrect!) {
+       HapticFeedback.vibrate();
       // Correct answer: +10 points
       setState(() {
         score += 10;
@@ -758,6 +760,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
     if (isSelected && isCorrect == true) {
       buttonColor = Colors.green;
       circleColor = Colors.white;
+     
     } else if (isSelected && isCorrect == false) {
       buttonColor = Colors.red;
       circleColor = Colors.white;
