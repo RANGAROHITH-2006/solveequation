@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:solveequationgame/pause_screen.dart';
@@ -140,6 +141,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
       Navigator.of(context, rootNavigator: true).pop();
       isWrongAnswerDialogOpen = false;
     }
+    HapticFeedback.vibrate();
     _showTimeUpPopup();
   }
 
@@ -275,6 +277,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
       if (currentRound >= GameData.roundsPerLevel) {
         // Level completed - show completion popup after animation
         Future.delayed(const Duration(milliseconds: 1500), () {
+          HapticFeedback.vibrate();
           _showLevelCompletePopup();
         });
       } else {
@@ -290,6 +293,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
         if (score < 0) score = 0; // Don't go below 0
       });
       // Show wrong answer popup with both answers
+      HapticFeedback.vibrate();
       _showWrongAnswerPopup(answer, currentQuestion.correctAnswer);
     }
   }
@@ -336,7 +340,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: Colors.red.withOpacity(0.3),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.cancel, color: Colors.red, size: 50),
@@ -375,7 +379,17 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                     // ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
+
+                Text(
+                  currentQuestion.equation,
+                  style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.white.withOpacity(0.8),
+                    fontWeight: FontWeight.bold
+                  ),
+                ),
+                const SizedBox(height: 12),
                 // Answer comparison
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -590,7 +604,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
 
                       Row(
                         children: [
-                          Container(
+                          SizedBox(
                             width: 36,
                             height: 36,
                             child: Image.asset(
@@ -753,7 +767,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
 
   Widget _buildOptionButton(int option) {
     // Determine button color based on selection
-    Color buttonColor = const Color(0xFF3D3D4E);
+    Color buttonColor = const Color(0xFF3D3D4E).withOpacity(0.6);
     Color circleColor = Colors.white.withOpacity(0.5);
     bool isSelected = selectedAnswer == option;
 

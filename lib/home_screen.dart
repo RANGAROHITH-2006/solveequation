@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'game_screen.dart';
@@ -207,7 +209,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                         width: 100,
                                         height: 40,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF8E8E93),
+                                          color: const Color(0xFF8E8E93).withOpacity(0.6),
                                           borderRadius: BorderRadius.circular(
                                             8,
                                           ),
@@ -233,7 +235,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                         width: 100,
                                         height: 40,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF8E8E93),
+                                          color: const Color(0xFF8E8E93).withOpacity(0.6),
                                           borderRadius: BorderRadius.circular(
                                             8,
                                           ),
@@ -254,7 +256,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                         width: 100,
                                         height: 40,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF8E8E93),
+                                          color: const Color(0xFF8E8E93).withOpacity(0.6),
                                           borderRadius: BorderRadius.circular(
                                             8,
                                           ),
