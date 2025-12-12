@@ -152,101 +152,104 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 39, 13, 65).withOpacity(0.9),
+        return PopScope(
+          canPop: false,
+          child: Dialog(
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Icon
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.timer_off,
-                    color: Colors.red,
-                    size: 50,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // Title
-                const Text(
-                  'Oops!',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Time Completed',
-                  style: TextStyle(fontSize: 18, color: Colors.white70),
-                ),
-                const SizedBox(height: 24),
-                // Retry button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _restartLevel();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 39, 13, 65).withOpacity(0.9),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Icon
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.2),
+                      shape: BoxShape.circle,
                     ),
-                    child: const Text(
-                      'Retry',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
+                    child: const Icon(
+                      Icons.timer_off,
+                      color: Colors.red,
+                      size: 50,
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                // Home button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2E1A47),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                  const SizedBox(height: 16),
+                  // Title
+                  const Text(
+                    'Oops!',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                    child: const Text(
-                      'Home',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Time Completed',
+                    style: TextStyle(fontSize: 18, color: Colors.white70),
+                  ),
+                  const SizedBox(height: 24),
+                  // Retry button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _restartLevel();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Retry',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  // Home button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF2E1A47),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Home',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -342,161 +345,163 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 39, 13, 65),
+        return PopScope(
+          canPop: false,
+          child: Dialog(
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Icon
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.3),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.cancel, color: Colors.red, size: 50),
-                ),
-                const SizedBox(height: 16),
-                // Title with -5
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Wrong !',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 39, 13, 65),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Icon
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.3),
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(width: 10),
-                    // Container(
-                    //   padding: const EdgeInsets.symmetric(
-                    //     horizontal: 8,
-                    //     vertical: 4,
-                    //   ),
-                    //   decoration: BoxDecoration(
-                    //     color: Colors.red.withOpacity(0.2),
-                    //     borderRadius: BorderRadius.circular(8),
-                    //   ),
-                    //   child: const Text(
-                    //     '-5',
-                    //     style: TextStyle(
-                    //       fontSize: 18,
-                    //       fontWeight: FontWeight.bold,
-                    //       color: Colors.red,
-                    //     ),
-                    //   ),
-                    // ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                Text(
-                  currentQuestion.equation,
-                  style: TextStyle(
-                    fontSize: 30,
-                    color: Colors.white.withOpacity(0.8),
-                    fontWeight: FontWeight.bold,
+                    child: const Icon(Icons.cancel, color: Colors.red, size: 50),
                   ),
-                ),
-                const SizedBox(height: 12),
-                // Answer comparison
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    // User's answer
-                    Column(
-                      children: [
-                        const Text(
-                          'Your Answer',
-                          style: TextStyle(fontSize: 14, color: Colors.white),
+                  const SizedBox(height: 16),
+                  // Title with -5
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Wrong !',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
                         ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.red, width: 2),
+                      ),
+                      // Container(
+                      //   padding: const EdgeInsets.symmetric(
+                      //     horizontal: 8,
+                      //     vertical: 4,
+                      //   ),
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.red.withOpacity(0.2),
+                      //     borderRadius: BorderRadius.circular(8),
+                      //   ),
+                      //   child: const Text(
+                      //     '-5',
+                      //     style: TextStyle(
+                      //       fontSize: 18,
+                      //       fontWeight: FontWeight.bold,
+                      //       color: Colors.red,
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+          
+                  Text(
+                    currentQuestion.equation,
+                    style: TextStyle(
+                      fontSize: 30,
+                      color: Colors.white.withOpacity(0.8),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Answer comparison
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // User's answer
+                      Column(
+                        children: [
+                          const Text(
+                            'Your Answer',
+                            style: TextStyle(fontSize: 14, color: Colors.white),
                           ),
-                          child: Text(
-                            '$userAnswer',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red,
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.red, width: 2),
+                            ),
+                            child: Text(
+                              '$userAnswer',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    // Correct answer
-                    Column(
-                      children: [
-                        const Text(
-                          'Correct Answer',
-                          style: TextStyle(fontSize: 14, color: Colors.white),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.green, width: 2),
+                        ],
+                      ),
+                      // Correct answer
+                      Column(
+                        children: [
+                          const Text(
+                            'Correct Answer',
+                            style: TextStyle(fontSize: 14, color: Colors.white),
                           ),
-                          child: Text(
-                            '$correctAnswer',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.green, width: 2),
+                            ),
+                            child: Text(
+                              '$correctAnswer',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                // Next button (changed from Try Again)
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      isWrongAnswerDialogOpen = false; // Mark dialog as closed
-                      Navigator.of(context).pop();
-                      // Replace with a new question from the pool
-                      _replaceWithNewQuestion();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        ],
                       ),
-                    ),
-                    child: const Text(
-                      'Next',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  // Next button (changed from Try Again)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        isWrongAnswerDialogOpen = false; // Mark dialog as closed
+                        Navigator.of(context).pop();
+                        // Replace with a new question from the pool
+                        _replaceWithNewQuestion();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Next',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
@@ -942,8 +947,8 @@ class _LevelCompleteDialogState extends State<_LevelCompleteDialog> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        countdownTimer?.cancel();
-        return true;
+        // countdownTimer?.cancel();
+        return false;
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -1178,14 +1183,14 @@ class _CorrectAnimationOverlayState extends State<_CorrectAnimationOverlay>
                 scale: _scaleAnimation.value,
                 child: Image.asset(
                   'assets/images/correct.png',
-                  width: 200,
-                  height: 200,
+                  width: 160,
+                  height: 160,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     // Fallback to icon if image not found
                     return Container(
-                      width: 200,
-                      height: 200,
+                      width: 160,
+                      height: 160,
                       decoration: BoxDecoration(
                         color: Colors.green.withOpacity(0.9),
                         shape: BoxShape.circle,
