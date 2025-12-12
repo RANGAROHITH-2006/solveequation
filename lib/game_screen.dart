@@ -30,6 +30,8 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
   bool isWrongAnswerDialogOpen = false; // Track if wrong answer dialog is open
   List<int> usedQuestionIndices = []; // Track used questions from the pool
   final Random _random = Random(); // Random generator for selecting questions
+  bool showScoreDeduction =
+      false; // Track if score deduction animation should show
 
   // Get current question based on round
   GameQuestion get currentQuestion => currentQuestions[currentRound - 1];
@@ -56,16 +58,16 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
     if (usedQuestionIndices.length >= gameLevel.questionPool.length) {
       usedQuestionIndices.clear();
     }
-    
+
     // Find an unused question
     int questionIndex;
     do {
       questionIndex = _random.nextInt(gameLevel.questionPool.length);
     } while (usedQuestionIndices.contains(questionIndex));
-    
+
     // Mark this question as used
     usedQuestionIndices.add(questionIndex);
-    
+
     return gameLevel.questionPool[questionIndex];
   }
 
@@ -73,10 +75,10 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
   void _replaceWithNewQuestion() {
     // Get a new question from the pool
     final newQuestion = _getRandomQuestionFromPool();
-    
+
     // Replace the current round's question with the new one
     currentQuestions[currentRound - 1] = newQuestion;
-    
+
     // Reset selection state
     setState(() {
       selectedAnswer = null;
@@ -171,7 +173,11 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                     color: Colors.red.withOpacity(0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.timer_off, color: Colors.red, size: 50),
+                  child: const Icon(
+                    Icons.timer_off,
+                    color: Colors.red,
+                    size: 50,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 // Title
@@ -186,10 +192,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                 const SizedBox(height: 8),
                 const Text(
                   'Time Completed',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.white70,
-                  ),
+                  style: TextStyle(fontSize: 18, color: Colors.white70),
                 ),
                 const SizedBox(height: 24),
                 // Retry button
@@ -264,7 +267,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
     });
 
     if (isCorrect!) {
-       HapticFeedback.vibrate();
+      HapticFeedback.vibrate();
       // Correct answer: +10 points
       setState(() {
         score += 10;
@@ -287,11 +290,28 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
         });
       }
     } else {
-      // Wrong answer: -5 points
+      // Wrong answer: -5 points (show animation only if score > 0)
+      final previousScore = score;
       setState(() {
         score -= 5;
         if (score < 0) score = 0; // Don't go below 0
+        // Show animation only if there was a score to deduct from
+        if (previousScore > 0) {
+          showScoreDeduction = true;
+        }
       });
+
+      // Hide animation after 1 second
+      if (previousScore > 0) {
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          if (mounted) {
+            setState(() {
+              showScoreDeduction = false;
+            });
+          }
+        });
+      }
+
       // Show wrong answer popup with both answers
       HapticFeedback.vibrate();
       _showWrongAnswerPopup(answer, currentQuestion.correctAnswer);
@@ -386,7 +406,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                   style: TextStyle(
                     fontSize: 30,
                     color: Colors.white.withOpacity(0.8),
-                    fontWeight: FontWeight.bold
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -760,6 +780,42 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
               ],
             ),
           ),
+          // Animated -5 score deduction overlay
+          if (showScoreDeduction)
+            Positioned(
+              top: 70,
+              right: 24,
+              child: TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 1000),
+                tween: Tween<double>(begin: 0, end: -30),
+                builder: (context, value, child) {
+                  return Transform.translate(
+                    offset: Offset(0, value),
+                    child: Opacity(
+                      opacity: 1 - (value.abs() / 30),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Text(
+                          '-5',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
         ],
       ),
     );
@@ -774,7 +830,6 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
     if (isSelected && isCorrect == true) {
       buttonColor = Colors.green;
       circleColor = Colors.white;
-     
     } else if (isSelected && isCorrect == false) {
       buttonColor = Colors.red;
       circleColor = Colors.white;
@@ -990,10 +1045,18 @@ class _LevelCompleteDialogState extends State<_LevelCompleteDialog> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
-                              Icons.workspace_premium,
-                              color: Colors.amber,
-                              size: 36,
+                            Image.asset(
+                              'assets/images/score.png',
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.workspace_premium,
+                                  color: Colors.amber,
+                                  size: 40,
+                                );
+                              },
                             ),
                             const SizedBox(width: 8),
                             Text(

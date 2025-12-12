@@ -7,6 +7,7 @@ class LevelProgressService {
   static const String _keyHighestLevel = 'highest_level_completed';
   static const String _keyLevelCompletionPrefix = 'level_completed_';
   static const String _keyLevelScorePrefix = 'level_score_';
+  static const String _keyTotalScore = 'total_score';
 
   static LevelProgressService? _instance;
   SharedPreferences? _prefs;
@@ -41,9 +42,29 @@ class LevelProgressService {
 
   /// Mark a specific level as completed
   Future<void> markLevelCompleted(int level, {int score = 0}) async {
+    // Check if level was already completed
+    final wasCompleted = isLevelCompleted(level);
+
     await _prefs?.setBool('$_keyLevelCompletionPrefix$level', true);
     await _prefs?.setInt('$_keyLevelScorePrefix$level', score);
     await updateHighestLevelCompleted(level);
+
+    // Update total score only if this is the first time completing this level
+    if (!wasCompleted) {
+      await _updateTotalScore(score);
+    }
+  }
+
+  /// Update the total score by adding the given score
+  Future<void> _updateTotalScore(int scoreToAdd) async {
+    final currentTotal = getTotalScore();
+    await _prefs?.setInt(_keyTotalScore, currentTotal + scoreToAdd);
+  }
+
+  /// Get the total accumulated score across all completed levels
+  /// Each level's score is counted only once, even if replayed
+  int getTotalScore() {
+    return _prefs?.getInt(_keyTotalScore) ?? 0;
   }
 
   /// Check if a specific level is completed
@@ -106,7 +127,13 @@ class LevelProgressService {
       final completed = isLevelCompleted(i);
       final unlocked = isLevelUnlocked(i);
       final score = getLevelScore(i);
-      print('Level $i: ${completed ? "Completed" : unlocked ? "Unlocked" : "Locked"} (Score: $score)');
+      print(
+        'Level $i: ${completed
+            ? "Completed"
+            : unlocked
+            ? "Unlocked"
+            : "Locked"} (Score: $score)',
+      );
     }
     print('===========================');
   }

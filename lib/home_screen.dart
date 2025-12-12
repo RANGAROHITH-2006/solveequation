@@ -86,6 +86,50 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                             ),
                             Row(
                               children: [
+                                // Total Score display
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/score.png',
+                                        width: 20,
+                                        height: 20,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (
+                                          context,
+                                          error,
+                                          stackTrace,
+                                        ) {
+                                          return SizedBox(
+                                            child: Icon(
+                                              Icons.workspace_premium,
+                                              color: Colors.yellow,
+                                              size: 20,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        '${_progressService.getTotalScore()}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
                                 GestureDetector(
                                   onTap: () {
                                     showHelpDialog(context);
@@ -117,11 +161,12 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                     setState(() {
                                       showing = !showing;
                                     });
-                                    if (showing){
-                                    Share.share(
-                                      'Check out Solve Equation Game! Test your math skills and solve equations quickly. Download now!',
-                                      subject: 'Play Solve Equation Game',
-                                    );}
+                                    if (showing) {
+                                      Share.share(
+                                        'Check out Solve Equation Game! Test your math skills and solve equations quickly. Download now!',
+                                        subject: 'Play Solve Equation Game',
+                                      );
+                                    }
                                   },
                                   child: Container(
                                     width: 36,
@@ -148,6 +193,7 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                             ),
                           ],
                         ),
+                        SizedBox(height: 10),
                         // Game preview area - Equation display
                         Expanded(
                           child: Container(
@@ -161,11 +207,14 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                     alignment: Alignment.center,
                                     children: [
                                       // Background book image
-                                      Image.asset(
-                                        'assets/images/book.png',
-                                        width: 280,
-                                        height: 150,
-                                        fit: BoxFit.contain,
+                                      SizedBox(
+                                        width: 130,
+                                        height: 130,
+                                        child: Image.asset(
+                                          'assets/images/book.png',
+
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
 
                                       const Text(
@@ -209,7 +258,9 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                         width: 100,
                                         height: 40,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF8E8E93).withOpacity(0.6),
+                                          color: const Color(
+                                            0xFF8E8E93,
+                                          ).withOpacity(0.6),
                                           borderRadius: BorderRadius.circular(
                                             8,
                                           ),
@@ -235,7 +286,9 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                         width: 100,
                                         height: 40,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF8E8E93).withOpacity(0.6),
+                                          color: const Color(
+                                            0xFF8E8E93,
+                                          ).withOpacity(0.6),
                                           borderRadius: BorderRadius.circular(
                                             8,
                                           ),
@@ -256,7 +309,9 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                         width: 100,
                                         height: 40,
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF8E8E93).withOpacity(0.6),
+                                          color: const Color(
+                                            0xFF8E8E93,
+                                          ).withOpacity(0.6),
                                           borderRadius: BorderRadius.circular(
                                             8,
                                           ),
@@ -274,7 +329,6 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                                       ),
                                     ],
                                   ),
-                                
                                 ],
                               ),
                             ),
@@ -295,149 +349,157 @@ class _EquationGameHomeScreenState extends State<EquationGameHomeScreen> {
                         topRight: Radius.circular(32),
                       ),
                     ),
-                    child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Header section
-                            const Text(
-                              'Games',
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Color(0xFF007AFF),
-                                fontWeight: FontWeight.w500,
-                              ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Header section
+                          const Text(
+                            'Games',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Color(0xFF007AFF),
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Solve Equation',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Solve Equation',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
-                            const SizedBox(height: 8),
+                          ),
+                          const SizedBox(height: 8),
 
-                            // Levels section
-                            const Text(
-                              'Levels',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
+                          // Levels section
+                          const Text(
+                            'Levels',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
                             ),
-                            const SizedBox(height: 8),
+                          ),
+                          const SizedBox(height: 8),
 
-                            // Level selector
-                            SizedBox(
-                              height: 90,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount:
-                                    GameData.getTotalLevels(), // Use dynamic level count
-                                itemBuilder: (context, index) {
-                                  final levelNumber = index + 1;
-                                  final isCompleted = _progressService
-                                      .isLevelCompleted(levelNumber);
-                                  final isUnlocked = _progressService
-                                      .isLevelUnlocked(levelNumber);
+                          // Level selector
+                          SizedBox(
+                            height: 80,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount:
+                                  GameData.getTotalLevels(), // Use dynamic level count
+                              itemBuilder: (context, index) {
+                                final levelNumber = index + 1;
+                                final isCompleted = _progressService
+                                    .isLevelCompleted(levelNumber);
+                                final isUnlocked = _progressService
+                                    .isLevelUnlocked(levelNumber);
 
-                                  return Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: LevelItem(
-                                      levelNumber: levelNumber,
-                                      isCompleted: isCompleted,
-                                      isUnlocked: isUnlocked,
-                                      isSelected: selectedLevel == levelNumber,
-                                      onTap: () {
-                                        // Select level instead of navigating
-                                        setState(() {
-                                          selectedLevel = levelNumber;
-                                        });
-                                      },
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: LevelItem(
+                                    levelNumber: levelNumber,
+                                    isCompleted: isCompleted,
+                                    isUnlocked: isUnlocked,
+                                    isSelected: selectedLevel == levelNumber,
+                                    onTap: () {
+                                      // Select level instead of navigating
+                                      setState(() {
+                                        selectedLevel = levelNumber;
+                                      });
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          // Scrollable benefits list
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  // Benefits section (scrollable)
+                                  Text(
+                                    'Benefits',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black,
                                     ),
-                                  );
-                                },
-                              ),
-                            ),
-
-                            const SizedBox(height: 8),
-
-                            // Benefits section
-                            const Text(
-                              'Benefits',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-
-                            const BenefitItem(
-                              icon: Icons.psychology_outlined,
-                              title: 'Math Skills Enhancement',
-                              description:
-                                  'Improve your arithmetic and problem-solving abilities through engaging practice.',
-                            ),
-                            const SizedBox(height: 16),
-                            const BenefitItem(
-                              icon: Icons.flash_on_outlined,
-                              title: 'Logical Thinking',
-                              description:
-                                  'Enhance your ability to think logically and understand mathematical patterns.',
-                            ),
-                            const SizedBox(height: 16),
-                            const BenefitItem(
-                              icon: Icons.timer_outlined,
-                              title: 'Quick Mental Calculations',
-                              description:
-                                  'Boost the speed at which you perform mental arithmetic and solve equations.',
-                            ),
-
-                            const SizedBox(height: 24),
-
-                            // Start button (requires level selection)
-                            SizedBox(
-                              width: double.infinity,
-                              height: 56,
-                              child: ElevatedButton(
-                                onPressed: selectedLevel != null
-                                    ? () {
-                                        // Start game with selected level
-                                        _startEquationGame(context, selectedLevel!);
-                                      }
-                                    : null, // Disable if no level selected
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF007AFF),
-                                  foregroundColor: Colors.white,
-                                  disabledBackgroundColor: Colors.grey,
-                                  disabledForegroundColor: Colors.white60,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
                                   ),
-                                ),
-                                child: Text(
+                                  SizedBox(height: 12),
+                                  BenefitItem(
+                                    icon: Icons.psychology_outlined,
+                                    title: 'Math Skills Enhancement',
+                                    description:
+                                        'Improve your arithmetic and problem-solving abilities through engaging practice.',
+                                  ),
+                                  SizedBox(height: 16),
+                                  BenefitItem(
+                                    icon: Icons.flash_on_outlined,
+                                    title: 'Logical Thinking',
+                                    description:
+                                        'Enhance your ability to think logically and understand mathematical patterns.',
+                                  ),
+                                  SizedBox(height: 16),
+                                  BenefitItem(
+                                    icon: Icons.timer_outlined,
+                                    title: 'Quick Mental Calculations',
+                                    description:
+                                        'Boost the speed at which you perform mental arithmetic and solve equations.',
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          // Start button (fixed at bottom)
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed:
                                   selectedLevel != null
-                                      ? 'Start Level $selectedLevel'
-                                      : 'Select a Level to Start',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                      ? () {
+                                        // Start game with selected level
+                                        _startEquationGame(
+                                          context,
+                                          selectedLevel!,
+                                        );
+                                      }
+                                      : null, // Disable if no level selected
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF007AFF),
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: Colors.grey,
+                                disabledForegroundColor: Colors.white60,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              child: Text(
+                                selectedLevel != null
+                                    ? 'Start Level $selectedLevel'
+                                    : 'Select a Level to Start',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
-                            const SizedBox(
-                              height: 32,
-                            ), // Add bottom padding for scroll
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -488,7 +550,10 @@ class LevelItem extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: isSelected ? Color(0xFF34C759) : Color(0xFF34C759).withOpacity(0.4),
+          color:
+              isSelected
+                  ? Color(0xFF34C759)
+                  : Color(0xFF34C759).withOpacity(0.4),
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.all(Radius.circular(12)),
           border: Border.all(
@@ -504,7 +569,10 @@ class LevelItem extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: isSelected ?  Color(0xFF007AFF) : Color(0xFF007AFF).withOpacity(0.4),
+          color:
+              isSelected
+                  ? Color(0xFF007AFF)
+                  : Color(0xFF007AFF).withOpacity(0.4),
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.all(Radius.circular(12)),
           border: Border.all(
