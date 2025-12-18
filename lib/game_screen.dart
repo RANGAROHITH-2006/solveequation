@@ -7,6 +7,7 @@ import 'dart:math';
 import 'game_data.dart';
 import 'services/level_progress_service.dart';
 import 'utils/help_dialog.dart';
+import 'level_complete_dialog.dart';
 
 class EquationGameScreen extends StatefulWidget {
   final int level;
@@ -32,6 +33,8 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
   final Random _random = Random(); // Random generator for selecting questions
   bool showScoreDeduction =
       false; // Track if score deduction animation should show
+  // Key for header score widget to animate coins from
+  final GlobalKey _headerScoreKey = GlobalKey();
 
   // Get current question based on round
   GameQuestion get currentQuestion => currentQuestions[currentRound - 1];
@@ -539,12 +542,24 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
     // Save level completion progress
     final progressService = LevelProgressService.instance;
     progressService.markLevelCompleted(widget.level, score: score);
-
-    showDialog(
+    // Show the popup dialog with coin animation. Pass the header score key
+    // so coins appear to fly from the top score to the dialog score.
+    LevelCompleteDialog.show(
       context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return _LevelCompleteDialog(level: widget.level, score: score);
+      level: widget.level,
+      score: score,
+      startScoreKey: _headerScoreKey,
+      hasNext: widget.level < GameData.getTotalLevels(),
+      onNext: () {
+        // Navigate to next level or home using the game screen context
+        final nextLevel = widget.level + 1;
+        if (nextLevel <= GameData.getTotalLevels()) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => EquationGameScreen(level: nextLevel)),
+          );
+        } else {
+          Navigator.of(context).pop();
+        }
       },
     );
   }
@@ -699,6 +714,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
                       // Score
                       Text(
                         'Score $score',
+                        key: _headerScoreKey,
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
@@ -889,241 +905,7 @@ class _EquationGameScreenState extends State<EquationGameScreen> {
   }
 }
 
-// Level Complete Dialog Widget
-class _LevelCompleteDialog extends StatefulWidget {
-  final int level;
-  final int score;
 
-  const _LevelCompleteDialog({required this.level, required this.score});
-
-  @override
-  State<_LevelCompleteDialog> createState() => _LevelCompleteDialogState();
-}
-
-class _LevelCompleteDialogState extends State<_LevelCompleteDialog> {
-  int countdown = 10;
-  Timer? countdownTimer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startCountdown();
-  }
-
-  void _startCountdown() {
-    countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (countdown > 1) {
-        setState(() {
-          countdown--;
-        });
-      } else {
-        timer.cancel();
-        _navigateToNextLevel();
-      }
-    });
-  }
-
-  void _navigateToNextLevel() {
-    Navigator.of(context).pop();
-    int nextLevel = widget.level + 1;
-    if (nextLevel <= GameData.getTotalLevels()) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => EquationGameScreen(level: nextLevel),
-        ),
-      );
-    } else {
-      Navigator.of(context).pop();
-    }
-  }
-
-  @override
-  void dispose() {
-    countdownTimer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        // countdownTimer?.cancel();
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          children: [
-            // Background image
-            Positioned.fill(
-              child: Image.asset(
-                'assets/images/background.png',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(color: const Color(0xFF1E0A32));
-                },
-              ),
-            ),
-            // Content
-            SafeArea(
-              child: Column(
-                children: [
-                  // Close button at top right
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16, right: 16),
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: GestureDetector(
-                        onTap: () {
-                          countdownTimer?.cancel();
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop();
-                        },
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.close,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Spacer(flex: 1),
-                  // Level Up Image
-                  Image.asset(
-                    'assets/images/completed.png',
-                    width: 250,
-                    height: 200,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 200,
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: Colors.amber.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.emoji_events,
-                          color: Colors.amber,
-                          size: 100,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 30),
-                  // Bottom card
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 24),
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E1E2E),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Great job! title
-                        const Text(
-                          'Great job!',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        // Your Score label
-                        const Text(
-                          'Your Score',
-                          style: TextStyle(fontSize: 16, color: Colors.white70),
-                        ),
-                        const SizedBox(height: 8),
-                        // Score with medal icon
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/images/score.png',
-                              width: 40,
-                              height: 40,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Icon(
-                                  Icons.workspace_premium,
-                                  color: Colors.amber,
-                                  size: 40,
-                                );
-                              },
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${widget.score}',
-                              style: const TextStyle(
-                                fontSize: 48,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        // Next Level button
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              countdownTimer?.cancel();
-                              _navigateToNextLevel();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF3B82F6),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                            child: Text(
-                              widget.level < GameData.getTotalLevels()
-                                  ? 'Next Level'
-                                  : 'Home',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        // Countdown text
-                        Text(
-                          'Next level starts in ${countdown}s',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.white54,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Spacer(flex: 1),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 // Correct Answer Animation Overlay
 class _CorrectAnimationOverlay extends StatefulWidget {
